@@ -1,5 +1,25 @@
 
+import React from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+    //TODO add regex for the url
+    website: yup.string().url(),
+    about: yup.string().required(),
+});
+
 const Form = () => {
+
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema),
+    });
+
+    const submitForm = (data) => {
+        // api requests 
+        console.log(data);
+    }
     return (
         <>
             <div>
@@ -13,12 +33,12 @@ const Form = () => {
                         </div>
                     </div>
                     <div className="mt-5 md:mt-0 md:col-span-2">
-                        <form action="#" method="POST">
+                        <form onSubmit={handleSubmit(submitForm)}>
                             <div className="shadow sm:rounded-md sm:overflow-hidden">
                                 <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
                                     <div className="grid grid-cols-3 gap-6">
                                         <div className="col-span-3 sm:col-span-2">
-                                            <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor="website" className="block text-sm font-medium text-gray-700">
                                                 Website
                                             </label>
                                             <div className="mt-1 flex rounded-md shadow-sm">
@@ -31,8 +51,10 @@ const Form = () => {
                                                     id="company-website"
                                                     className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
                                                     placeholder="www.example.com"
+                                                    {...register("website")}
                                                 />
                                             </div>
+                                            <p>{errors.website?.message} </p>
                                         </div>
                                     </div>
 
@@ -48,7 +70,10 @@ const Form = () => {
                                                 className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                                                 placeholder="you@example.com"
                                                 defaultValue={''}
+                                                {...register("about")}
+
                                             />
+                                            <p>{errors.about?.message} </p>
                                         </div>
                                         <p className="mt-2 text-sm text-gray-500">
                                             Brief description for your profile. URLs are hyperlinked.
