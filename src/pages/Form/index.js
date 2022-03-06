@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -12,14 +12,41 @@ const schema = yup.object().shape({
 
 const Form = () => {
 
+    const [image, setImage] = useState(null);
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
     });
 
+
+
+    // this is our event handler
     const submitForm = (data) => {
         // api requests 
         console.log(data);
     }
+
+    // preview profile photo
+    const handlePreview = (file) => {
+        console.log(file)
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => setImage(reader.result);
+    };
+    //change profile photo
+    const handleOnChange = (event) => {
+        console.log(event);
+        const file = event.target.files[0];
+        handlePreview(file);
+    };
+
+    // Create a reference to the hidden file input element
+    const fileRef = useRef(null);
+    // Programatically click the hidden file input element
+    // when the Button component is clicked
+    const handleClick = (event) => {
+        fileRef.current.click();
+    };
+
     return (
         <>
             <div>
@@ -65,7 +92,7 @@ const Form = () => {
                                         <div className="mt-1">
                                             <textarea
                                                 id="about"
-                                                name="about"
+                                                //name="about"
                                                 rows={3}
                                                 className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                                                 placeholder="you@example.com"
@@ -81,20 +108,36 @@ const Form = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Photo</label>
+                                        <span className="block text-sm font-medium text-gray-700">Photo</span>
                                         <div className="mt-1 flex items-center">
                                             <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
-                                                <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                                                </svg>
+                                                {image ?
+                                                    <img htmlFor="profilePhoto" src={image} /> :
+                                                    <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                    </svg>}
                                             </span>
-                                            <button
+                                            <button onClick={handleClick}
                                                 type="button"
                                                 className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             >
-                                                Change
+                                                Upload
                                             </button>
+                                            <label htmlFor="profilePhoto">
+                                                <input id="profilePhoto"
+                                                    className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                    type="file"
+                                                    hidden
+                                                    /* or --> style={{display: 'none'}} Make the file input element invisible */
+                                                    multiple={false}
+                                                    ref={fileRef}
+                                                    onChange={handleOnChange}
+                                                />
+                                            </label>
+
+
                                         </div>
+
                                     </div>
 
                                     <div>
